@@ -103,9 +103,9 @@ int main(void)
     //__HAL_SPI_ENABLE(&spi_to_nfcm1833tinz); 
   while (1)
   {
-          HAL_GPIO_WritePin (GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-          HAL_Delay (150);
-          HAL_GPIO_WritePin (GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
+          //HAL_GPIO_WritePin (GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
+          HAL_Delay (50);
+          //HAL_GPIO_WritePin (GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
           HAL_RTC_GetTime(&hrtc,&sTime,RTC_FORMAT_BIN);
           HAL_RTC_GetDate(&hrtc,&sDate,RTC_FORMAT_BIN);
           Second = sTime.Seconds;
@@ -129,9 +129,9 @@ int main(void)
                     idTagBCD[count] += 0x30;
                   }
                 } 
-                HAL_Delay(100);
-                __HAL_SPI_DISABLE(&spi_to_nfcm1833tinz); 
-                HAL_Delay(100);
+       
+                //__HAL_SPI_DISABLE(&spi_to_nfcm1833tinz); 
+                //HAL_Delay(100);
                 //display(idTagBCD);
                 DisplaySendText(25,45,"Sending...",16);
                 //DisplaySendText(17,55,"Nhap Tien",12);
@@ -172,23 +172,24 @@ int main(void)
               }
               countSend++;
             }
-            HAL_Delay(500);
+            HAL_Delay(300);
             if(countSend > 0){
               DisplaySendText(25,47,"Re-Check",16); 
               HAL_Delay(2000);
             }
             DisplaySendText(25,50,"Welcome",16); 
             ONBUZZER;
-            HAL_Delay(400);
+            HAL_Delay(300);
             OFFBUZZER;
             permissReadTag = 0;
             break;
           default:
             DisplaySendText(25,45,"Sending...",16);
-            char url[100] = "AT+HTTPPARA=\"URL\",\"http://testcodeesp8266.000webhostapp.com/receiver.php?UID=\"";
+            //char url[100] = "AT+HTTPPARA=\"URL\",\"http://testcodeesp8266.000webhostapp.com/receiver.php?UID=\"";
+            char url[100] = "AT+HTTPPARA=\"URL\",\"http://nfcapi.conek.net/conek/activesim\"";
             if(Sim_sendCommand(url,"OK",10000)){
               if(Sim_sendCommand("AT+HTTPACTION=0","OK",10000)){
-                if(Sim_Response("200",5000)){
+                if(Sim_Response("200",10000)){
                  
                 }
               }

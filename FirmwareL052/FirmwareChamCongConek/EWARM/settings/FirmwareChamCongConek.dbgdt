@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <Project>
     <WindowStorage>
         <ChildIdMap>
@@ -135,7 +135,7 @@
                 <RecentlyUsedMenus>1</RecentlyUsedMenus>
                 <MenuShadows>1</MenuShadows>
                 <ShowAllMenusAfterDelay>1</ShowAllMenusAfterDelay>
-                <CommandsUsage>070100000400138600001500000056860000EB0000000E810000010000004681000006000000</CommandsUsage>
+                <CommandsUsage>A40100000400138600001500000056860000760100000E810000010000004681000018000000</CommandsUsage>
             </MFCToolBarParameters>
             <CommandManager>
                 <CommandsWithoutImages>0000</CommandsWithoutImages>
