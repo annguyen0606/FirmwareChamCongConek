@@ -56,11 +56,11 @@ int main(void)
     uint8_t Minute = 0;
     char urlDiemDanh[100] = "AT+HTTPPARA=\"URL\",\"http://nfcapi.conek.net/conek/dulieudiemdanh?uidTag=";
     char urlActive[100] = "AT+HTTPPARA=\"URL\",\"http://nfcapi.conek.net/conek/activesim\"";
-    HAL_Init();
+    HAL_Init(); 
     SystemClock_Config();
 
     MX_GPIO_Init();
-    HAL_Delay(8000);
+    HAL_Delay(7000);
     MX_CRC_Init();
     MX_I2C1_Init();
     MX_RTC_Init();
@@ -100,7 +100,7 @@ int main(void)
             HAL_RTC_GetDate(&hrtc,&sDates,RTC_FORMAT_BIN);
             Second = sTimes.Seconds;
             Minute = sTimes.Minutes;
-            if((Minute == 1 && Second <= 3) || (Minute == 20 && Second <= 3) || (Minute == 40 && Second <= 3))
+            if((Minute == 1 && Second <= 3) || (Minute == 30 && Second <= 3))
             {
               permissReadTag = 4;
             }      
@@ -131,18 +131,18 @@ int main(void)
                   HAL_UART_Transmit(&huart1, &idTagBCD[i], 1, 1000);
                 }          
                 if(Sim_sendCommand("\"","OK",5000)){
-                //if(Sim_sendCommand(urlActive,"OK",5000)){
                   ssd1306_display_string(60, 40, ".", 16, 1);
                   ssd1306_refresh_gram();
-                  HAL_Delay(5);
-                  if(Sim_sendCommand("AT+HTTPACTION=0","OK",5000)){
-                    if(Sim_Response("200",10000)){
-                      DisplaySendText(25,50,"Success",16);
-                      countSend = 0;
-                      break;
-                    }
-                  }                                    
                 }
+                HAL_Delay(5);
+                if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
+                  HAL_Delay(100);
+                  if(Sim_Response("200",10000)){
+                    DisplaySendText(25,50,"Success",16);
+                    countSend = 0;
+                    break;
+                  }
+                }                                                    
                 countSend++;
               }
               if(countSend > 0){
@@ -164,14 +164,16 @@ int main(void)
             default:
               HAL_Delay(10);
               DisplaySendText(25,45,"Sending...",16);
-              if(Sim_sendCommand(urlActive,"OK",5000)){
-                HAL_Delay(10);
-                if(Sim_sendCommand("AT+HTTPACTION=0","OK",5000)){
-                  if(Sim_Response("200",10000)){
-                   
-                  }
-                }
+              if(Sim_sendCommand(urlActive,"OK",3000)){
               }
+              HAL_Delay(10);
+              if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
+                HAL_Delay(100);
+                if(Sim_Response("200",10000)){
+                  
+                }
+              }             
+              HAL_Delay(10);
               __HAL_SPI_ENABLE(&spi_to_nfcm1833tinz);
               permissReadTag = 0;
               DisplaySendText(25,50,"Welcome",16);
@@ -357,6 +359,7 @@ int8_t Sim_Response(char*response,uint32_t timeout)
     }
   }
   while(answer == 0);
+  while(HAL_UART_Receive(&huart1, (uint8_t *)Sim_Rxdata1, 1, 2000) == HAL_OK){}
   return answer;
 }
 int8_t Sim_sendCommand_IMEI(char*command)
@@ -586,7 +589,7 @@ static void MX_RTC_Init(void)
   /* USER CODE BEGIN RTC_Init 2 */
 
   /* USER CODE END RTC_Init 2 */
-
+  HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP1R,0x32F2);
 }
 
 /**
