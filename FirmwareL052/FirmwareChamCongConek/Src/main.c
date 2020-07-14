@@ -49,6 +49,9 @@ RTC_DateTypeDef sDates;
 
 #define ONBUZZER  HAL_GPIO_WritePin (GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 #define OFFBUZZER  HAL_GPIO_WritePin (GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+
+#define ONLED HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
+#define OFFLED HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
 int main(void)
 {
     uint8_t count = 0;
@@ -96,14 +99,6 @@ int main(void)
     HAL_Delay(100);
     while (1)
     {
-            HAL_RTC_GetTime(&hrtc,&sTimes,RTC_FORMAT_BIN);
-            HAL_RTC_GetDate(&hrtc,&sDates,RTC_FORMAT_BIN);
-            Second = sTimes.Seconds;
-            Minute = sTimes.Minutes;
-            if((Minute == 1 && Second <= 3) || (Minute == 30 && Second <= 3))
-            {
-              permissReadTag = 4;
-            }      
             uint8_t countSend = 0;
             switch(permissReadTag)
             {
@@ -118,6 +113,8 @@ int main(void)
                       idTagBCD[count] += 0x30;
                     }
                   } 
+                  __HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
+                  __HAL_UART_ENABLE(&huart1);
                   DisplaySendText(25,45,"Sending...",16);
                   permissReadTag = 1;  
                 }            
@@ -154,14 +151,16 @@ int main(void)
               HAL_Delay(300);
               OFFBUZZER;
               permissReadTag = 0;
-              __HAL_SPI_ENABLE(&spi_to_nfcm1833tinz);
               deleteBuffer((char *)idTagBCD);
               deleteBuffer((char *)Sim_response);
               deleteBuffer((char *)Sim_Rxdata);
               deleteBuffer((char *)Sim_Rxdata1);
               WakeUp_TinZ();
+              __HAL_UART_DISABLE(&huart1);
               break;
             default:
+              __HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
+              __HAL_UART_ENABLE(&huart1);
               HAL_Delay(10);
               DisplaySendText(25,45,"Sending...",16);
               if(Sim_sendCommand(urlActive,"OK",3000)){
@@ -174,7 +173,6 @@ int main(void)
                 }
               }             
               HAL_Delay(10);
-              __HAL_SPI_ENABLE(&spi_to_nfcm1833tinz);
               permissReadTag = 0;
               DisplaySendText(25,50,"Welcome",16);
               deleteBuffer((char *)idTagBCD);
@@ -182,9 +180,21 @@ int main(void)
               deleteBuffer((char *)Sim_Rxdata);
               deleteBuffer((char *)Sim_Rxdata1);    
               WakeUp_TinZ();
+              __HAL_UART_DISABLE(&huart1);
               break;
             }
+            HAL_RTC_GetTime(&hrtc,&sTimes,RTC_FORMAT_BIN);
+            HAL_RTC_GetDate(&hrtc,&sDates,RTC_FORMAT_BIN);
+            Second = sTimes.Seconds;
+            Minute = sTimes.Minutes;
+            if((Minute == 1 && Second <= 3) || (Minute == 30 && Second <= 3))
+            {
+              permissReadTag = 4;
+            }       
+            ONLED;
             HAL_Delay (100);
+            OFFLED;
+            __HAL_SPI_ENABLE(&spi_to_nfcm1833tinz);
       }
 }
 uint8_t KhoiDongSim(){
@@ -415,9 +425,9 @@ void SystemClock_Config(void)
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSI48;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;//|RCC_OSCILLATORTYPE_HSI48;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
+  //RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -615,7 +625,7 @@ static void MX_SPI1_Init(void)
   spi_to_nfcm1833tinz.Init.CLKPolarity = SPI_POLARITY_LOW;
   spi_to_nfcm1833tinz.Init.CLKPhase = SPI_PHASE_1EDGE;
   spi_to_nfcm1833tinz.Init.NSS = SPI_NSS_SOFT;
-  spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   spi_to_nfcm1833tinz.Init.FirstBit = SPI_FIRSTBIT_MSB;
   spi_to_nfcm1833tinz.Init.TIMode = SPI_TIMODE_DISABLE;
   spi_to_nfcm1833tinz.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -714,13 +724,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   
     GPIO_InitTypeDef GPIO_InitStruct = {0};
-    HAL_GPIO_WritePin (GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
-    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    HAL_GPIO_WritePin (GPIOA, GPIO_PIN_8|GPIO_PIN_1, GPIO_PIN_RESET);
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_1;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     HAL_GPIO_Init (GPIOA, &GPIO_InitStruct);
-    HAL_GPIO_WritePin (GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin (GPIOA, GPIO_PIN_8|GPIO_PIN_1, GPIO_PIN_RESET);
 }
 
 /* USER CODE BEGIN 4 */
