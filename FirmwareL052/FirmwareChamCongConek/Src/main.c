@@ -195,6 +195,7 @@ int main(void)
             HAL_Delay (100);
             OFFLED;
             __HAL_SPI_ENABLE(&spi_to_nfcm1833tinz);
+            HAL_GPIO_WritePin(SPI1_SS_GPIO_Port,SPI1_SS_Pin,GPIO_PIN_RESET);
       }
 }
 uint8_t KhoiDongSim(){
@@ -628,7 +629,7 @@ static void MX_SPI1_Init(void)
   spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
   spi_to_nfcm1833tinz.Init.FirstBit = SPI_FIRSTBIT_MSB;
   spi_to_nfcm1833tinz.Init.TIMode = SPI_TIMODE_DISABLE;
-  spi_to_nfcm1833tinz.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  spi_to_nfcm1833tinz.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;
   spi_to_nfcm1833tinz.Init.CRCPolynomial = 7;
   if (HAL_SPI_Init(&spi_to_nfcm1833tinz) != HAL_OK)
   {
