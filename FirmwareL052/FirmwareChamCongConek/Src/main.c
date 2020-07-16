@@ -115,6 +115,7 @@ int main(void)
                   } 
                   __HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
                   __HAL_UART_ENABLE(&huart1);
+                  __HAL_I2C_ENABLE(&hi2c1);
                   DisplaySendText(25,45,"Sending...",16);
                   permissReadTag = 1;  
                 }            
@@ -157,10 +158,12 @@ int main(void)
               deleteBuffer((char *)Sim_Rxdata1);
               WakeUp_TinZ();
               __HAL_UART_DISABLE(&huart1);
+              __HAL_I2C_DISABLE(&hi2c1);
               break;
             default:
               __HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
               __HAL_UART_ENABLE(&huart1);
+              __HAL_I2C_ENABLE(&hi2c1);
               HAL_Delay(10);
               DisplaySendText(25,45,"Sending...",16);
               if(Sim_sendCommand(urlActive,"OK",3000)){
@@ -181,21 +184,26 @@ int main(void)
               deleteBuffer((char *)Sim_Rxdata1);    
               WakeUp_TinZ();
               __HAL_UART_DISABLE(&huart1);
+              __HAL_I2C_DISABLE(&hi2c1);
               break;
             }
             HAL_RTC_GetTime(&hrtc,&sTimes,RTC_FORMAT_BIN);
             HAL_RTC_GetDate(&hrtc,&sDates,RTC_FORMAT_BIN);
             Second = sTimes.Seconds;
             Minute = sTimes.Minutes;
-            if((Minute == 1 && Second <= 3) || (Minute == 30 && Second <= 3))
+            if((Minute == 1 && Second <= 3) || (Minute == 35 && Second <= 3))
             {
               permissReadTag = 4;
+              HAL_Delay(1000);
+              
             }       
-            ONLED;
-            HAL_Delay (100);
-            OFFLED;
+            //ONLED;
+            HAL_Delay (10);
+            //OFFLED;
             __HAL_SPI_ENABLE(&spi_to_nfcm1833tinz);
+            HAL_Delay (10);
             HAL_GPIO_WritePin(SPI1_SS_GPIO_Port,SPI1_SS_Pin,GPIO_PIN_RESET);
+            HAL_Delay (10);
       }
 }
 uint8_t KhoiDongSim(){
