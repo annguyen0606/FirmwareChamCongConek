@@ -183,8 +183,11 @@ int main(void)
               deleteBuffer((char *)Sim_Rxdata);
               deleteBuffer((char *)Sim_Rxdata1);    
               WakeUp_TinZ();
+              HAL_Delay(10);
               __HAL_UART_DISABLE(&huart1);
+              HAL_Delay(10);
               __HAL_I2C_DISABLE(&hi2c1);
+              HAL_Delay(10);
               break;
             }
             HAL_RTC_GetTime(&hrtc,&sTimes,RTC_FORMAT_BIN);
@@ -201,6 +204,7 @@ int main(void)
             HAL_Delay (10);
             //OFFLED;
             __HAL_SPI_ENABLE(&spi_to_nfcm1833tinz);
+            
             HAL_Delay (10);
             HAL_GPIO_WritePin(SPI1_SS_GPIO_Port,SPI1_SS_Pin,GPIO_PIN_RESET);
             HAL_Delay (10);
@@ -634,7 +638,7 @@ static void MX_SPI1_Init(void)
   spi_to_nfcm1833tinz.Init.CLKPolarity = SPI_POLARITY_LOW;
   spi_to_nfcm1833tinz.Init.CLKPhase = SPI_PHASE_1EDGE;
   spi_to_nfcm1833tinz.Init.NSS = SPI_NSS_SOFT;
-  spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   spi_to_nfcm1833tinz.Init.FirstBit = SPI_FIRSTBIT_MSB;
   spi_to_nfcm1833tinz.Init.TIMode = SPI_TIMODE_DISABLE;
   spi_to_nfcm1833tinz.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;

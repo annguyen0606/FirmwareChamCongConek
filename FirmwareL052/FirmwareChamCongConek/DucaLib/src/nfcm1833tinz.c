@@ -9,6 +9,10 @@
 #ifdef STM32F401xC
     #include "stm32f4xx_ll_spi.h"
 #endif
+#ifdef STM32L052xx
+    #include "stm32l0xx_ll_spi.h"
+#endif
+
 
 
 

@@ -46,4 +46,5 @@ nfcm1833tinz.pbi: \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\string.h \
   C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\DLib_Product_string.h \
   E:\Firmware\STM32L432KC-DYN5\FirmwareChamCongConek\FirmwareL052\FirmwareChamCongConek\EWARM\..\DucaLib\inc\debug_uart.h \
-  C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stdio.h
+  C:\Program\ Files\ (x86)\IAR\ Systems\Embedded\ Workbench\ 8.3\arm\inc\c\stdio.h \
+  E:\Firmware\STM32L432KC-DYN5\FirmwareChamCongConek\FirmwareL052\FirmwareChamCongConek\EWARM/../Drivers/STM32L0xx_HAL_Driver/Inc\stm32l0xx_ll_spi.h
