@@ -28,7 +28,6 @@ static void MX_USART2_UART_Init(void);
 uint8_t idTag[ID_TAG_SIZE];
 uint8_t idTagBCD[ID_TAG_SIZE * 2];
 
-
 static void WakeUp_TinZ (void);
 void display(char* data);
 void deleteBuffer(char* buf);
@@ -103,38 +102,37 @@ int main(void)
             switch(permissReadTag)
             {
             case 0:
-                if ( (ping_module() == PING_OK) && (select_tag_type (TYPE_5) == PROTOCOL_OK) && (getDeviceID (idTag) == SEND_RECV_OK))
+              if((ping_module() == PING_OK) && (select_tag_type (TYPE_5) == PROTOCOL_OK) && (getDeviceID (idTag) == SEND_RECV_OK)){
+                idTag[7] = 0x00;
+                if (encode8byte_little_edian (idTag, idTagBCD) == 0)
                 {
-                  idTag[7] = 0x00;
-                  if (encode8byte_little_edian (idTag, idTagBCD) == 0)
+                  for (count = 0; count < ID_TAG_SIZE * 2; count++)
                   {
-                    for (count = 0; count < ID_TAG_SIZE * 2; count++)
-                    {
-                      idTagBCD[count] += 0x30;
-                    }
-                  } 
-                  __HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
-                  __HAL_UART_ENABLE(&huart1);
-                  __HAL_I2C_ENABLE(&hi2c1);
-                  DisplaySendText(25,45,"Sending...",16);
-                  permissReadTag = 1;  
-                }            
+                    idTagBCD[count] += 0x30;
+                  }
+                }
+                permissReadTag = 1;  
+                //__HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
+                DisplaySendText(25,45,"Sending...",16);    
+                //HAL_Delay(500);
+                //DisplaySendText(25,50,"Welcome",16);
+              }
                 break;
             case 1:
               while(countSend < 5)
               {
-                HAL_Delay(10);                
+                HAL_Delay(5);                
                 display((char *)urlDiemDanh);   
                 for(uint8_t i = 0; i < 16; i++){
                   HAL_UART_Transmit(&huart1, &idTagBCD[i], 1, 1000);
                 }          
-                if(Sim_sendCommand("\"","OK",5000)){
+                if(Sim_sendCommand("\"","OK",3000)){
                   ssd1306_display_string(60, 40, ".", 16, 1);
                   ssd1306_refresh_gram();
                 }
                 HAL_Delay(5);
                 if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
-                  HAL_Delay(100);
+                  HAL_Delay(10);
                   if(Sim_Response("200",10000)){
                     DisplaySendText(25,50,"Success",16);
                     countSend = 0;
@@ -149,45 +147,34 @@ int main(void)
               }
               DisplaySendText(25,50,"Welcome",16); 
               ONBUZZER;
-              HAL_Delay(300);
+              HAL_Delay(200);
               OFFBUZZER;
               permissReadTag = 0;
               deleteBuffer((char *)idTagBCD);
               deleteBuffer((char *)Sim_response);
               deleteBuffer((char *)Sim_Rxdata);
               deleteBuffer((char *)Sim_Rxdata1);
-              WakeUp_TinZ();
-              __HAL_UART_DISABLE(&huart1);
-              __HAL_I2C_DISABLE(&hi2c1);
+              //__HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
               break;
             default:
-              __HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
-              __HAL_UART_ENABLE(&huart1);
-              __HAL_I2C_ENABLE(&hi2c1);
               HAL_Delay(10);
               DisplaySendText(25,45,"Sending...",16);
               if(Sim_sendCommand(urlActive,"OK",3000)){
               }
               HAL_Delay(10);
               if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
-                HAL_Delay(100);
+                HAL_Delay(10);
                 if(Sim_Response("200",10000)){
                   
                 }
               }             
-              HAL_Delay(10);
               permissReadTag = 0;
               DisplaySendText(25,50,"Welcome",16);
               deleteBuffer((char *)idTagBCD);
               deleteBuffer((char *)Sim_response);
               deleteBuffer((char *)Sim_Rxdata);
               deleteBuffer((char *)Sim_Rxdata1);    
-              WakeUp_TinZ();
-              HAL_Delay(10);
-              __HAL_UART_DISABLE(&huart1);
-              HAL_Delay(10);
-              __HAL_I2C_DISABLE(&hi2c1);
-              HAL_Delay(10);
+              //__HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
               break;
             }
             HAL_RTC_GetTime(&hrtc,&sTimes,RTC_FORMAT_BIN);
@@ -197,17 +184,7 @@ int main(void)
             if((Minute == 1 && Second <= 3) || (Minute == 35 && Second <= 3))
             {
               permissReadTag = 4;
-              HAL_Delay(1000);
-              
             }       
-            //ONLED;
-            HAL_Delay (10);
-            //OFFLED;
-            __HAL_SPI_ENABLE(&spi_to_nfcm1833tinz);
-            
-            HAL_Delay (10);
-            HAL_GPIO_WritePin(SPI1_SS_GPIO_Port,SPI1_SS_Pin,GPIO_PIN_RESET);
-            HAL_Delay (10);
       }
 }
 uint8_t KhoiDongSim(){
@@ -217,29 +194,23 @@ uint8_t KhoiDongSim(){
       ssd1306_display_string(40, 23, "Connecting", 12, 1);
       ssd1306_display_string(55, 35, ".", 16, 1);
       ssd1306_refresh_gram();
-      if(Sim_sendCommand("AT","OK",10000))
-      {
+      if(Sim_sendCommand("AT","OK",10000)){
         ssd1306_display_string(60, 35, ".", 16, 1);
         ssd1306_refresh_gram();
         HAL_Delay(10);
-        if(Sim_sendCommand("AT+SAPBR=3,1,\"Contype\",\"GPRS\"","OK",10000))
-        {
+        if(Sim_sendCommand("AT+SAPBR=3,1,\"Contype\",\"GPRS\"","OK",10000)){
           ssd1306_display_string(65, 35, ".", 16, 1);
           ssd1306_refresh_gram();
           HAL_Delay(10);        
-          if(Sim_sendCommand("AT+SAPBR=3,1,\"APN\",\"e-connect\"","OK",10000))		
-          {
+          if(Sim_sendCommand("AT+SAPBR=3,1,\"APN\",\"e-connect\"","OK",10000)){
             ssd1306_display_string(70, 35, ".", 16, 1);
             ssd1306_refresh_gram();
             HAL_Delay(10);           
-            if(Sim_sendCommand("AT+SAPBR=1,1","OK",10000))
-            {
+            if(Sim_sendCommand("AT+SAPBR=1,1","OK",10000)){
               ssd1306_display_string(75, 35, ".", 16, 1);
               ssd1306_refresh_gram();
               HAL_Delay(10);             
-              
-              if(Sim_sendCommand("AT+HTTPINIT","OK",10000))
-              {
+              if(Sim_sendCommand("AT+HTTPINIT","OK",10000)){
                 ssd1306_display_string(80, 35, ".", 16, 1);
                 ssd1306_refresh_gram();
                 HAL_Delay(10);
@@ -638,7 +609,7 @@ static void MX_SPI1_Init(void)
   spi_to_nfcm1833tinz.Init.CLKPolarity = SPI_POLARITY_LOW;
   spi_to_nfcm1833tinz.Init.CLKPhase = SPI_PHASE_1EDGE;
   spi_to_nfcm1833tinz.Init.NSS = SPI_NSS_SOFT;
-  spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
+  spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   spi_to_nfcm1833tinz.Init.FirstBit = SPI_FIRSTBIT_MSB;
   spi_to_nfcm1833tinz.Init.TIMode = SPI_TIMODE_DISABLE;
   spi_to_nfcm1833tinz.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;

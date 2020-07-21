@@ -41,7 +41,7 @@ static HAL_StatusTypeDef spi_send_data_to_cr95hf (uint8_t* data_send, uint8_t da
     HAL_StatusTypeDef status = HAL_SPI_TransmitReceive (&spi_to_nfcm1833tinz, data_control_send, data_temp, 1, SPI_TIMEOUT);
     status |= HAL_SPI_TransmitReceive (&spi_to_nfcm1833tinz, data_send, data_temp, data_len & SPI_CMD_MAX_LENGTH, SPI_TIMEOUT);
     HAL_GPIO_WritePin (SPI1_SS_GPIO_Port, SPI1_SS_Pin, GPIO_PIN_SET);
-    HAL_Delay (10);
+    HAL_Delay (8);
 #ifdef DEBUG_UART
     if (status == HAL_OK)
     {
@@ -71,7 +71,7 @@ static HAL_StatusTypeDef spi_polling_data_cr95hf (void)
         }
         
     HAL_GPIO_WritePin (SPI1_SS_GPIO_Port, SPI1_SS_Pin, GPIO_PIN_SET);
-    HAL_Delay (10);
+    HAL_Delay (8);
     
     if (counter >= SPI_POLLING_TIMEOUT)
         status = HAL_ERROR;
