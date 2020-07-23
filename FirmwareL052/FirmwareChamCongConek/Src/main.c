@@ -608,7 +608,7 @@ static void MX_SPI1_Init(void)
   spi_to_nfcm1833tinz.Init.DataSize = SPI_DATASIZE_8BIT;
   spi_to_nfcm1833tinz.Init.CLKPolarity = SPI_POLARITY_LOW;
   spi_to_nfcm1833tinz.Init.CLKPhase = SPI_PHASE_1EDGE;
-  spi_to_nfcm1833tinz.Init.NSS = SPI_NSS_SOFT;
+  spi_to_nfcm1833tinz.Init.NSS = SPI_NSS_HARD_OUTPUT;
   spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   spi_to_nfcm1833tinz.Init.FirstBit = SPI_FIRSTBIT_MSB;
   spi_to_nfcm1833tinz.Init.TIMode = SPI_TIMODE_DISABLE;
