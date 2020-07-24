@@ -121,7 +121,7 @@ int main(void)
             case 1:
               while(countSend < 5)
               {
-                HAL_Delay(5);                
+                HAL_Delay(10);                
                 display((char *)urlDiemDanh);   
                 for(uint8_t i = 0; i < 16; i++){
                   HAL_UART_Transmit(&huart1, &idTagBCD[i], 1, 1000);
@@ -130,10 +130,10 @@ int main(void)
                   ssd1306_display_string(60, 40, ".", 16, 1);
                   ssd1306_refresh_gram();
                 }
-                HAL_Delay(5);
+                HAL_Delay(10);
                 if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
                   HAL_Delay(10);
-                  if(Sim_Response("200",10000)){
+                  if(Sim_Response("200",5000)){
                     DisplaySendText(25,50,"Success",16);
                     countSend = 0;
                     break;
@@ -164,7 +164,7 @@ int main(void)
               HAL_Delay(10);
               if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
                 HAL_Delay(10);
-                if(Sim_Response("200",10000)){
+                if(Sim_Response("200",5000)){
                   
                 }
               }             
@@ -184,7 +184,7 @@ int main(void)
             if((Minute == 1 && Second <= 3) || (Minute == 35 && Second <= 3))
             {
               permissReadTag = 4;
-            }       
+            } 
       }
 }
 uint8_t KhoiDongSim(){
