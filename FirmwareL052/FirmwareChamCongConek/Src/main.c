@@ -114,8 +114,6 @@ int main(void)
                 permissReadTag = 1;  
                 //__HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
                 DisplaySendText(25,45,"Sending...",16);    
-                //HAL_Delay(500);
-                //DisplaySendText(25,50,"Welcome",16);
               }
                 break;
             case 1:
@@ -150,10 +148,6 @@ int main(void)
               HAL_Delay(200);
               OFFBUZZER;
               permissReadTag = 0;
-              deleteBuffer((char *)idTagBCD);
-              deleteBuffer((char *)Sim_response);
-              deleteBuffer((char *)Sim_Rxdata);
-              deleteBuffer((char *)Sim_Rxdata1);
               //__HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
               break;
             default:
@@ -170,11 +164,6 @@ int main(void)
               }             
               permissReadTag = 0;
               DisplaySendText(25,50,"Welcome",16);
-              deleteBuffer((char *)idTagBCD);
-              deleteBuffer((char *)Sim_response);
-              deleteBuffer((char *)Sim_Rxdata);
-              deleteBuffer((char *)Sim_Rxdata1);    
-              //__HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
               break;
             }
             HAL_RTC_GetTime(&hrtc,&sTimes,RTC_FORMAT_BIN);
@@ -435,10 +424,10 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1//|RCC_PERIPHCLK_USART2
                               |RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_RTC;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
-  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  //PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
@@ -583,7 +572,7 @@ static void MX_RTC_Init(void)
   /* USER CODE BEGIN RTC_Init 2 */
 
   /* USER CODE END RTC_Init 2 */
-  HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP1R,0x32F2);
+  //HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP1R,0x32F2);
 }
 
 /**
@@ -608,11 +597,11 @@ static void MX_SPI1_Init(void)
   spi_to_nfcm1833tinz.Init.DataSize = SPI_DATASIZE_8BIT;
   spi_to_nfcm1833tinz.Init.CLKPolarity = SPI_POLARITY_LOW;
   spi_to_nfcm1833tinz.Init.CLKPhase = SPI_PHASE_1EDGE;
-  spi_to_nfcm1833tinz.Init.NSS = SPI_NSS_HARD_OUTPUT;
+  spi_to_nfcm1833tinz.Init.NSS = SPI_NSS_SOFT;
   spi_to_nfcm1833tinz.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   spi_to_nfcm1833tinz.Init.FirstBit = SPI_FIRSTBIT_MSB;
   spi_to_nfcm1833tinz.Init.TIMode = SPI_TIMODE_DISABLE;
-  spi_to_nfcm1833tinz.Init.CRCCalculation = SPI_CRCCALCULATION_ENABLE;
+  spi_to_nfcm1833tinz.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
   spi_to_nfcm1833tinz.Init.CRCPolynomial = 7;
   if (HAL_SPI_Init(&spi_to_nfcm1833tinz) != HAL_OK)
   {
