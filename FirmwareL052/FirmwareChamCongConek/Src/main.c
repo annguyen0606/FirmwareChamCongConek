@@ -127,41 +127,47 @@ int main(void)
                 if(Sim_sendCommand("\"","OK",3000)){
                   ssd1306_display_string(60, 40, ".", 16, 1);
                   ssd1306_refresh_gram();
-                }
-                HAL_Delay(10);
-                if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
                   HAL_Delay(10);
-                  if(Sim_Response("200",5000)){
-                    DisplaySendText(25,50,"Success",16);
-                    countSend = 0;
-                    break;
-                  }
-                }                                                    
+                  if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
+                    HAL_Delay(10);
+                    if(Sim_Response("200",5000)){
+                      DisplaySendText(25,50,"Success",16);
+                      countSend = 0;
+                      break;
+                    }
+                  }                                                                      
+                }else{
+                  countSend = 1;
+                  break;
+                }
                 countSend++;
               }
               if(countSend > 0){
                 DisplaySendText(25,47,"Re-Check",16); 
                 HAL_Delay(1500);
+                DisplaySendText(25,47,"Pl!Reset",16); 
+              }else{
+                DisplaySendText(25,50,"Welcome",16); 
+                ONBUZZER;
+                HAL_Delay(200);
+                OFFBUZZER;
+                permissReadTag = 0;              
               }
-              DisplaySendText(25,50,"Welcome",16); 
-              ONBUZZER;
-              HAL_Delay(200);
-              OFFBUZZER;
-              permissReadTag = 0;
-              //__HAL_SPI_DISABLE(&spi_to_nfcm1833tinz);
               break;
             default:
               HAL_Delay(10);
               DisplaySendText(25,45,"Sending...",16);
               if(Sim_sendCommand(urlActive,"OK",3000)){
-              }
-              HAL_Delay(10);
-              if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
                 HAL_Delay(10);
-                if(Sim_Response("200",5000)){
-                  
-                }
-              }             
+                ssd1306_display_string(60, 40, ".", 16, 1);
+                ssd1306_refresh_gram();                
+                if(Sim_sendCommand("AT+HTTPACTION=0","OK",3000)){
+                  HAL_Delay(10);
+                  if(Sim_Response("200",5000)){
+                    
+                  }
+                }                             
+              }              
               permissReadTag = 0;
               DisplaySendText(25,50,"Welcome",16);
               break;
